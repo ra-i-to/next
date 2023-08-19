@@ -9,11 +9,14 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import HeaderMenu from "./HeaderMenu";
+import { useRouter } from "next/router";
 
 type Props = {};
 
 const Header = (props: Props) => {
     const { user, error, isLoading } = useUser();
+
+    const router = useRouter();
 
     if (isLoading) return <div>Loading...</div>;
     if (error) return <div>{error.message}</div>;
@@ -34,21 +37,52 @@ const Header = (props: Props) => {
                 <Box sx={{ flexGrow: 1 }}>
                     <AppBar position="static">
                         <Toolbar>
-                            <IconButton
-                                size="large"
-                                edge="start"
-                                color="inherit"
-                                aria-label="menu"
-                                sx={{ mr: 2 }}
-                                onClick={handleMenuClick}
-                            >
-                                <MenuIcon />
-                            </IconButton>
+                            {(() => {
+                                if (!user || (user && user.email_verified === true)) {
+                                    return (
+                                        <IconButton
+                                            size="large"
+                                            edge="start"
+                                            color="inherit"
+                                            aria-label="menu"
+                                            sx={{ mr: 2 }}
+                                            onClick={handleMenuClick}
+                                        >
+                                            <MenuIcon />
+                                        </IconButton>
+                                    );
+                                }
+                            })()}
+
                             <HeaderMenu handleMenuClose={handleMenuClose} menuOpenFlg={menuOpenFlg} />
                             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                                 App
                             </Typography>
-                            <Button color="inherit">ログイン</Button>
+                            {(() => {
+                                if (!user || (user && user.email_verified)) {
+                                    return (
+                                        <Button
+                                            color="inherit"
+                                            onClick={() => {
+                                                router.push("/api/auth/login");
+                                            }}
+                                        >
+                                            ログイン
+                                        </Button>
+                                    );
+                                } else if (user && !user.email_verified) {
+                                    return (
+                                        <Button
+                                            color="inherit"
+                                            onClick={() => {
+                                                router.push("/api/auth/logout");
+                                            }}
+                                        >
+                                            ログアウト
+                                        </Button>
+                                    );
+                                }
+                            })()}
                         </Toolbar>
                     </AppBar>
                 </Box>

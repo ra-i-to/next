@@ -9,11 +9,17 @@ const ProtectRoute = ({ children }) => {
     const router = useRouter();
 
     const { user, error, isLoading } = useUser();
+
     if (router.isReady && !user) {
         if (typeof window !== "undefined") {
             if (router.pathname !== "/api/auth/login") {
                 router.push("/");
             }
+        }
+    }
+    if (!isLoading && user) {
+        if (!user.email_verified && router.pathname !== "/api/auth/logout") {
+            router.push("/signup");
         }
     }
     return children;
