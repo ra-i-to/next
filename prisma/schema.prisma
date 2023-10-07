@@ -12,17 +12,17 @@ datasource db {
 
 model User {
   id            String        @id @default(cuid())
-  userId        String
+  accountId     String        @unique
   name          String?
-  birth         DateTime
+  birth         DateTime?
   profile       String?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   deletedAt     DateTime?
   icon          Icon?
-  location      Location?
-
-  @@unique([id, userId])
+  locationId    String?
+  location      Location?     @relation(fields: [locationId], references: [id])
+  @@unique([id])
   @@map(name: "users")
 }
 
@@ -39,9 +39,20 @@ model Icon {
 model Location {
   id            String        @id @default(cuid())
   locationName  String
-  user          User          @relation(fields: [userId], references: [id])
-  userId        String        @unique
+  users         User[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   deletedAt     DateTime?
+  @@unique([id])
+}
+
+model UserRegistrationStatus {
+  id                String        @id @default(cuid())
+  accountId         String        @unique
+  preRegisteredAt   DateTime
+  registeredAt      DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  deletedAt         DateTime?
+  @@unique([id])
 }

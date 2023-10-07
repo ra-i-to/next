@@ -1,6 +1,9 @@
+import { NextPage } from "next";
 import Header from "../components/Header";
 
-export default function Home() {
+type Props = {};
+
+const index: NextPage = (props: Props) => {
   return (
     <>
       <main>
@@ -10,4 +13,6 @@ export default function Home() {
       </main>
     </>
   );
-}
+};
+
+export default index;
