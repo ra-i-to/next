@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { Drawer, List, ListItem, ListItemButton, IconButton, Box, ListItemIcon, ListItemText} from '@mui/material';
 import { DarkMode, LightMode, Login, Logout, Home, AccountCircle } from "@mui/icons-material";
-import { ThemeStatusContext } from "@/src/contexts/ThemeStatusContext";
+import { ThemeStatus,ThemeStatusContext } from "@/src/contexts/ThemeStatusContext";
 import {createTheme} from "@mui/material/styles";
 
 type Props = {
@@ -49,7 +49,7 @@ const HeaderMenu = (props: Props) => {
     const router = useRouter();
     const { themeStatus, setThemeStatus } = useContext(ThemeStatusContext);
     const handleIconToggle = () => {
-        setThemeStatus(prev => (prev === 'light' ? 'dark' : 'light'));
+        setThemeStatus((prev:ThemeStatus) => (prev === 'light' ? 'dark' : 'light'));
     };
     const themeContant = ()=>{
         if (themeStatus==='light'){
