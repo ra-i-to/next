@@ -1,17 +1,10 @@
-import Drawer from "@mui/material/Drawer";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import HomeIcon from "@mui/icons-material/Home";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import LoginIcon from "@mui/icons-material/Login";
-import LogoutIcon from "@mui/icons-material/Logout";
+import React, { useRef, useState, useContext } from "react";
 import { useRouter } from "next/router";
 import { useUser } from "@auth0/nextjs-auth0/client";
-
-import React, { useRef, useState } from "react";
+import { Drawer, List, ListItem, ListItemButton, IconButton, Box, ListItemIcon, ListItemText} from '@mui/material';
+import { DarkMode, LightMode, Login, Logout, Home, AccountCircle } from "@mui/icons-material";
+import { ThemeStatusContext } from "@/src/contexts/ThemeStatusContext";
+import {createTheme} from "@mui/material/styles";
 
 type Props = {
     handleMenuClose: any;
@@ -19,29 +12,33 @@ type Props = {
 };
 
 const menuList = [
-    { text: "ホーム", path: "/home", icon: HomeIcon, loggedin: true },
+    {   text: "ホーム",
+        path: "/home",
+        icon: Home,
+        loggedin: true,
+    },
     {
         text: "プロフィール",
         path: "/profile",
-        icon: AccountCircleIcon,
+        icon: AccountCircle,
         loggedin: true,
     },
     {
         text: "ログイン",
         path: "/api/auth/login",
-        icon: LoginIcon,
+        icon: Login,
         loggedin: false,
     },
     {
         text: "新規登録",
         path: "/api/auth/login",
-        icon: LoginIcon,
+        icon: Login,
         loggedin: false,
     },
     {
         text: "ログアウト",
         path: "/api/auth/logout",
-        icon: LogoutIcon,
+        icon: Logout,
         loggedin: true,
     },
 ];
@@ -50,10 +47,21 @@ const HeaderMenu = (props: Props) => {
     const { user, error, isLoading } = useUser();
 
     const router = useRouter();
+    const { themeStatus, setThemeStatus } = useContext(ThemeStatusContext);
+    const handleIconToggle = () => {
+        setThemeStatus(prev => (prev === 'light' ? 'dark' : 'light'));
+    };
+    const themeContant = ()=>{
+        if (themeStatus==='light'){
+           return <LightMode/>;
+        } else if (themeStatus==='dark'){
+            return <DarkMode />;
+        }
+    }
     return (
         <>
             <Drawer anchor="left" open={props.menuOpenFlg} onClose={props.handleMenuClose}>
-                <List>
+                <List style={{flex:1}}>
                     {menuList.map((menu, index) => {
                         if ((menu.loggedin && user) || (!menu.loggedin && !user)) {
                             return (
@@ -71,6 +79,11 @@ const HeaderMenu = (props: Props) => {
                         }
                     })}
                 </List>
+                <Box mt={2} display="flex" justifyContent="center">
+                    <IconButton aria-label="themeflag" onClick={handleIconToggle}>
+                        {themeContant()}
+                    </IconButton>
+                </Box>
             </Drawer>
         </>
     );
