@@ -1,14 +1,16 @@
 import { createContext, Dispatch, SetStateAction } from "react";
 import { UserProfile } from "@auth0/nextjs-auth0/client";
-import { User } from "@prisma/client";
+import { User } from "../model/User";
+import { UserInfo } from "../model/UserInfo";
 
-type UserInfo = {
-  auth0User: UserProfile | null;
-  setAuth0User: (user: UserProfile | null) => void;
-  user: User | null;
-  setUser: (user: User | null) => void;
+const defaultUserInfo: UserInfo = {
+  auth0User: null,
+  // setAuth0User: () => {},
+  user: null,
+  // setUser: () => {},
+  loading: null,
 };
 
-const UserInfoContext = createContext<UserInfo | undefined>(undefined);
+const UserInfoContext = createContext<UserInfo>(defaultUserInfo);
 
 export default UserInfoContext;

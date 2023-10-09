@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import UserInfoContext from "../contexts/UserInfoContext";
 import { UserContext, UserProfile, useUser } from "@auth0/nextjs-auth0/client";
-import { User } from "@prisma/client";
 import { useGetUser } from "../hooks/user/getUser";
+import { User } from "../model/User";
 
 type Props = {
   children: React.ReactNode;
@@ -11,36 +11,40 @@ type Props = {
 const GlobalStateProvider: React.FC<Props> = ({ children }) => {
   const [auth0User, setAuth0User] = useState<UserProfile | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [accountId, setAccountId] = useState<string | null>(null);
 
   const {
     user: iAuth0User,
-    error: auth0Error,
-    isLoading: auth0Loading,
+    error: iAuth0Error,
+    isLoading: iAuth0Loading,
   }: UserContext = useUser();
-  const {
-    user: iUser,
-    loading: Loading,
-    error: Error,
-  } = useGetUser(typeof iAuth0User?.sid === "string" ? iAuth0User?.sid : "");
+  const { fetchUser } = useGetUser(accountId);
 
   useEffect(() => {
-    if (auth0Error) {
-      // throw new Error(auth0Error.message);
-    } else if (!auth0Loading && user) {
-      setAuth0User(user);
+    if (iAuth0Error) {
+      console.error(iAuth0Error);
+    } else if (!iAuth0Loading && iAuth0User) {
+      setAuth0User(iAuth0User);
+      if (iAuth0User.sub) {
+        setAccountId(iAuth0User.sub);
+      }
     }
+  }, [iAuth0Loading]);
 
-    if (Error) {
-      // throw iError;
-    } else if (!Loading && iUser) {
+  useEffect(() => {
+    const getUser = async () => {
+      const iUser = await fetchUser();
       setUser(iUser);
+      setLoading(false);
+    };
+    if (accountId) {
+      getUser();
     }
-  }, [auth0Loading, Loading]);
+  }, [accountId]);
 
   return (
-    <UserInfoContext.Provider
-      value={{ auth0User, setAuth0User, user, setUser }}
-    >
+    <UserInfoContext.Provider value={{ auth0User, user, loading }}>
       {children}
     </UserInfoContext.Provider>
   );
