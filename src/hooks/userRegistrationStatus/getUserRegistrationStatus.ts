@@ -1,58 +1,47 @@
-import { useState, useEffect } from "react";
 import { UserRegistrationStatus } from "../../model/UserRegistrationStatus";
 
 export const useGetUserRegistrationStatus = (accountId: string) => {
-  const [userRegistrationStatus, setUserRegistrationStatus] =
-    useState<UserRegistrationStatus | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    const fetchUserRegistrationStatus = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch("/api/userRegistrationStatus", {
+  const fetchUserRegistrationStatus = async () => {
+    try {
+      const response = await fetch(
+        "/api/userRegistrationStatus" + "?accountId=" + accountId,
+        {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ accountId: accountId }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
         }
+      );
 
-        const data = await response.json();
-
-        // required item
-        const iData = new UserRegistrationStatus(
-          data.userRegistrationStatus.id,
-          data.userRegistrationStatus.accountId,
-          data.userRegistrationStatus.preRegisteredAt,
-          data.userRegistrationStatus.createdAt,
-          data.userRegistrationStatus.updatedAt
-        );
-
-        // optional item
-        if (data.userRegistrationStatus.registeredAt) {
-          iData.registeredAt = data.userRegistrationStatus.registeredAt;
-        }
-
-        if (data.userRegistrationStatus.deletedAt) {
-          iData.deletedAt = data.userRegistrationStatus.deletedAt;
-        }
-
-        setUserRegistrationStatus(iData);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
       }
-    };
 
-    fetchUserRegistrationStatus();
-  }, [accountId]);
+      const data = await response.json();
 
-  return [userRegistrationStatus, loading, error];
+      // required item
+      const iData = new UserRegistrationStatus(
+        data.id,
+        data.accountId,
+        data.preRegisteredAt,
+        data.createdAt,
+        data.updatedAt
+      );
+
+      // optional item
+      if (data.registeredAt) {
+        iData.registeredAt = data.registeredAt;
+      }
+
+      if (data.deletedAt) {
+        iData.deletedAt = data.deletedAt;
+      }
+
+      return iData;
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return { fetchUserRegistrationStatus };
 };
