@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import { Head } from "next/document";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Header from "../components/Header";
 import {
   Box,
@@ -26,15 +26,35 @@ import { before } from "node:test";
 import { useGetLocations } from "../hooks/location/getLocations";
 import NextLink from "next/link";
 import { Location } from "../model/Location";
+import UserInfoContext from "../contexts/UserInfoContext";
+import { UserInfo } from "../model/UserInfo";
+import { useRouter } from "next/router";
+import { useGetUserRegistrationStatus } from "../hooks/userRegistrationStatus/getUserRegistrationStatus";
 
 type Props = {};
 
 const userInfoRegistration: NextPage = (props: Props) => {
+  const context = useContext(UserInfoContext);
+  const { auth0User, user, loading: contextLoading }: UserInfo = context;
+  const [accountId, setAccountId] = useState<string | null>(null);
+  const { fetchUserRegistrationStatus } =
+    useGetUserRegistrationStatus(accountId);
+
+  useEffect(() => {
+    if (contextLoading === false) {
+      const sub = auth0User?.sub;
+      if (sub) {
+        setAccountId(sub);
+      }
+    }
+  }, [contextLoading]);
+
   const [userName, setUserName] = useState<string>("");
   const [birth, setBirth] = useState<string>("");
   const [profile, setProfile] = useState<string>("");
   const [locationId, setLocationId] = useState<string>("");
-  const [locations, loading, locationLodingError] = useGetLocations();
+  const { fetchLocations } = useGetLocations();
+  const [locations, setLocations] = useState([]);
   const [agreed, setAgreed] = useState(false);
   const [validateFlag, setValidateFlag] = useState(false);
   const [validateMessages, setValidateMessages] = useState<string[]>([]);
@@ -91,6 +111,8 @@ const userInfoRegistration: NextPage = (props: Props) => {
           ]);
         }
       }
+
+      // 本会員情報登録処理
     }
     if (!agreed) {
       setValidateMessages((prev) => [...prev, "利用規約に同意してください。"]);
@@ -100,6 +122,13 @@ const userInfoRegistration: NextPage = (props: Props) => {
       setValidateFlag(true);
     }
   }
+
+  useEffect(() => {
+    const getLocations = async () => {
+      setLocations(await fetchLocations());
+    };
+    getLocations();
+  });
 
   return (
     <>
