@@ -30,15 +30,19 @@ import UserInfoContext from "../contexts/UserInfoContext";
 import { UserInfo } from "../model/UserInfo";
 import { useRouter } from "next/router";
 import { useGetUserRegistrationStatus } from "../hooks/userRegistrationStatus/getUserRegistrationStatus";
+import { useGetUser } from "../hooks/user/getUser";
+import { User } from "../model/User";
+import { useCreateUser } from "../hooks/user/createUser";
 
 type Props = {};
 
 const userInfoRegistration: NextPage = (props: Props) => {
+  const router = useRouter();
   const context = useContext(UserInfoContext);
   const { auth0User, user, loading: contextLoading }: UserInfo = context;
   const [accountId, setAccountId] = useState<string | null>(null);
-  const { fetchUserRegistrationStatus } =
-    useGetUserRegistrationStatus(accountId);
+  const { fetchUser } = useGetUser(accountId);
+  const { postUser } = useCreateUser();
 
   useEffect(() => {
     if (contextLoading === false) {
@@ -75,7 +79,8 @@ const userInfoRegistration: NextPage = (props: Props) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  function handleClickRegist() {
+  const handleClickRegist = async () => {
+    // 入力チェック
     setValidateFlag(false);
     setValidateMessages([]);
     if (!userName) {
@@ -85,6 +90,7 @@ const userInfoRegistration: NextPage = (props: Props) => {
         "ユーザー名を入力してください。",
       ]);
     }
+    let birthDate = null;
     if (!birth) {
       setValidateMessages((prev) => [...prev, "生年月日を入力してください。"]);
     } else {
@@ -98,12 +104,11 @@ const userInfoRegistration: NextPage = (props: Props) => {
         const year = parseInt(birth.substring(0, 4), 10);
         const month = parseInt(birth.substring(4, 6), 10);
         const day = parseInt(birth.substring(6, 8), 10);
-        const date = new Date(year, month - 1, day);
-        console.log(date.getFullYear(), date.getMonth() + 1, date.getDate());
+        birthDate = new Date(year, month - 1, day);
         if (
-          date.getFullYear() !== year ||
-          date.getMonth() + 1 !== month ||
-          date.getDate() !== day
+          birthDate.getFullYear() !== year ||
+          birthDate.getMonth() + 1 !== month ||
+          birthDate.getDate() !== day
         ) {
           setValidateMessages((prev) => [
             ...prev,
@@ -111,8 +116,6 @@ const userInfoRegistration: NextPage = (props: Props) => {
           ]);
         }
       }
-
-      // 本会員情報登録処理
     }
     if (!agreed) {
       setValidateMessages((prev) => [...prev, "利用規約に同意してください。"]);
@@ -120,8 +123,48 @@ const userInfoRegistration: NextPage = (props: Props) => {
 
     if (validateMessages.length > 0) {
       setValidateFlag(true);
+      return;
     }
-  }
+
+    console.log(accountId);
+    if (!accountId) {
+      return false;
+    }
+
+    // 本会員情報登録処理
+    const result = await userRegistration(
+      accountId,
+      userName,
+      birthDate,
+      profile
+    );
+
+    console.log("本会員登録処理結果", result);
+
+    if (result) {
+      router.push("/home");
+    }
+  };
+
+  const userRegistration = async (
+    accountId: string,
+    name: string,
+    birth: Date | null,
+    profile: string
+  ) => {
+    // 問題がある場合、エラーメッセージを表示予定　現在は一旦保留
+
+    const existUser = await fetchUser();
+    if (existUser) {
+      // 既に本会員登録済みのため登録処理をスキップ
+      console.log("既に本会員登録済みのため登録処理をスキップ");
+      return null;
+    }
+
+    const result = postUser(accountId, name, birth, profile);
+
+    return result;
+  };
 
   useEffect(() => {
     const getLocations = async () => {
