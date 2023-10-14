@@ -1,7 +1,5 @@
 import { NextPage } from "next";
-import { Head } from "next/document";
 import React, { useContext, useEffect, useState } from "react";
-import Header from "../components/Header";
 import {
   Box,
   Button,
@@ -11,7 +9,6 @@ import {
   FormControlLabel,
   Grid,
   InputLabel,
-  Link,
   List,
   ListItem,
   ListItemText,
@@ -22,16 +19,13 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { before } from "node:test";
 import { useGetLocations } from "../hooks/location/getLocations";
 import NextLink from "next/link";
 import { Location } from "../model/Location";
 import UserInfoContext from "../contexts/UserInfoContext";
 import { UserInfo } from "../model/UserInfo";
 import { useRouter } from "next/router";
-import { useGetUserRegistrationStatus } from "../hooks/userRegistrationStatus/getUserRegistrationStatus";
 import { useGetUser } from "../hooks/user/getUser";
-import { User } from "../model/User";
 import { useCreateUser } from "../hooks/user/createUser";
 
 type Props = {};
