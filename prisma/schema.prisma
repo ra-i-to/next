@@ -56,3 +56,34 @@ model UserRegistrationStatus {
   deletedAt         DateTime?
   @@unique([id])
 }
+
+model Post {
+  id                String        @id @default(cuid())
+  accountId         String
+  photos            Photo[]
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  deletedAt         DateTime?
+  @@unique([id])
+}
+
+model Photo {
+  id                String        @id @default(cuid())
+  postId            String
+  post              Post          @relation(fields: [postId], references: [id])
+  url               String
+  cameraMaker       String?
+  cameraModel       String?
+  lensMaker         String?
+  lensModel         String?
+  exposureTime      String?
+  fNumber           String?
+  iso               String?
+  focalLength       String?
+  shotDate          DateTime?
+  shotLocation      String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  deletedAt         DateTime?
+  @@unique([id])
+}

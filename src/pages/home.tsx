@@ -1,16 +1,25 @@
+import { Button } from "@mui/material";
 import { NextPage } from "next";
-import { Head } from "next/document";
+import { useRouter } from "next/router";
 import React from "react";
-import Header from "../components/Header";
 
 type Props = {};
 
 const home: NextPage = (props: Props) => {
+  const router = useRouter();
   return (
     <>
       <main>
         <div>
           <h2>Home</h2>
+          <Button
+            variant="contained"
+            onClick={() => {
+              router.push("/post/create");
+            }}
+          >
+            New Post
+          </Button>
         </div>
       </main>
     </>
