@@ -3,6 +3,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Post } from "../model/Post";
 import { useGetPosts } from "../hooks/post/getPosts";
 import Masonry from "@mui/lab/Masonry";
+import PostDialog from "./PostDialog";
 
 type Props = {};
 
@@ -33,12 +34,25 @@ const PostList = (props: Props) => {
 
   const columns = getColumnsCount(width);
 
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handlePhotoClick = (post: Post) => {
+    setSelectedPost(post);
+    setIsDialogOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+    setSelectedPost(null);
+  };
+
   return (
     <>
       <Box ref={containerRef}>
         <Masonry columns={columns} spacing={2}>
           {posts.map((post, index) => (
-            <Box key={index}>
+            <Box key={index} onClick={() => handlePhotoClick(post)}>
               <img
                 src={post.photos[0].url}
                 loading="lazy"
@@ -52,6 +66,11 @@ const PostList = (props: Props) => {
           ))}
         </Masonry>
       </Box>
+      <PostDialog
+        selectedPost={selectedPost}
+        isDialogOpen={isDialogOpen}
+        handleDialogClose={handleDialogClose}
+      />
     </>
   );
 };
