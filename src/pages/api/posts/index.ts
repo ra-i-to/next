@@ -49,6 +49,25 @@ router.post(async (req, res) => {
   }
 });
 
+router.get(async (req, res) => {
+  try {
+    const posts = await prisma.post.findMany({
+      include: {
+        photos: true,
+      },
+    });
+
+    if (posts) {
+      res.json(posts);
+    } else {
+      res.status(404).json({ error: "Post not found" });
+    }
+  } catch (error) {
+    console.error("Error in GET /api/posts:", error);
+    res.status(500).json({ error: "Server error", message: error.message });
+  }
+});
+
 export const config = {
   api: {
     bodyParser: false,

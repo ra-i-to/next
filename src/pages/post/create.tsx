@@ -68,14 +68,14 @@ const home: NextPage = (props: Props) => {
     }
   };
 
-  const handlePost = () => {
+  const handlePost = async () => {
     if (!accountId) return;
     if (!file) return;
     if (!shotDate) {
       setShotDate(null);
     }
 
-    const result = postNewPost(
+    const result = await postNewPost(
       accountId,
       file,
       cameraMaker,
@@ -91,6 +91,8 @@ const home: NextPage = (props: Props) => {
     );
 
     console.log(result);
+
+    router.push("/home");
   };
 
   return (

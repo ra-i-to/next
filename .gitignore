@@ -39,4 +39,4 @@ next-env.d.ts
 prisma/dev.db
 
 # upload photos
-/public/uploads
+/public/uploads/
