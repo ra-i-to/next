@@ -26,7 +26,8 @@ export const useGetUser = (accountId: string) => {
         data.profile,
         data.locationId,
         data.createdAt,
-        data.updatedAt
+        data.updatedAt,
+        data.locationId,
       );
 
       // optional item

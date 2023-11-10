@@ -20,7 +20,8 @@ export class User {
     locationId: string | null,
     createdAt: Date,
     updatedAt: Date,
-    deletedAt?: Date
+    locationId: string,
+    deletedAt?: Date,
     // icon?: Icon,
     // location?: Location
   ) {
@@ -34,6 +35,7 @@ export class User {
     this._updatedAt = updatedAt;
     this._deletedAt = deletedAt;
     // this._icon = icon;
+    this._locationId = locationId;
     // this._location = location;
   }
 

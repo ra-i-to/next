@@ -1,61 +1,74 @@
 import { NextPage } from "next";
-import React, { useContext, useEffect, useState } from "react";
-import { UserInfo } from "@/src/model/UserInfo";
+import React, {useContext, useEffect, useState} from "react";
+import {UserInfo} from "@/src/model/UserInfo";
+import {NextRouter, useRouter} from 'next/router';
 import UserInfoContext from "@/src/contexts/UserInfoContext";
-import { useGetLocations } from "@/src/hooks/location/getLocations";
-import ListItem from "@mui/material/ListItem";
-import List from "@mui/material/List";
+import {useGetLocation} from "@/src/hooks/location/getLocation";
+import Button from '@mui/material/Button';
+import EditIcon from '@mui/icons-material/Edit';
+
 
 type Props = {};
 
 const profile: NextPage = (props: Props) => {
-  const context = useContext(UserInfoContext);
-  const { auth0User, user, loading: contextLoading }: UserInfo = context;
-  const [userName, setUserName] = useState<string>("");
-  const [birth, setBirth] = useState<string>("");
-  const [profile, setProfile] = useState<string>("");
-  const [locationId, setLocationId] = useState<string>("");
-  const [locations, setLocations] = useState([]);
-  const { fetchLocations } = useGetLocations();
+    const context = useContext(UserInfoContext);
+    const { auth0User, user, loading: contextLoading }: UserInfo = context;
+    const [userName, setUserName] = useState<string>("");
+    const [birth, setBirth] = useState<string>("");
+    const [profile, setProfile] = useState<string>("");
+    const [locationId, setLocationId] = useState<string>("");
+    const [location, setLocation] = useState(null);
+    const { fetchLocation } = useGetLocation();
+    const router : NextRouter = useRouter();
 
-  //user情報取得(Auth0侧)
-  useEffect(() => {
-    if (contextLoading === false) {
-      setLocationId(user?.locationId);
-      const birthday = new Date(user?.birth);
-      if (birthday) {
-        const yyyy = birthday.getFullYear();
-        const mm = birthday.getMonth() + 1;
-        const dd = birthday.getDate();
-        console.log(yyyy, mm, dd);
-      }
-    }
-  }, [contextLoading]);
+    //user情報取得(Auth0侧)
+    useEffect(() => {
+        if (contextLoading === false) {
+            setLocationId(user?.locationId);
+            setUserName(user?.name);
+            if(user?.birth){
+                const birthday = new Date(user?.birth)
+                const yyyy:string = birthday.getFullYear();
+                let mm = birthday.getMonth() + 1; // 月は0から始まるので1を足す
+                let dd = birthday.getDate();
+                if (mm < 10) mm = `0${mm}`;
+                if (dd < 10) dd = `0${dd}`;
+                setBirth(`${yyyy}年${mm}月${dd}日`);
+            }
+            setProfile(user?.profile);
+        }
+    }, [contextLoading]);
 
-  //locations取得(local)
-  useEffect(() => {
-    const getLocations = async () => {
-      setLocations(await fetchLocations());
-    };
-    getLocations();
-  });
-  return (
-    <>
-      <main>
-        <div>
-          <h2>Profile</h2>
-          <List>
-            {locations &&
-              locations.map((location) =>
-                location.id === locationId ? (
-                  <ListItem key={location.id}>{location.locationName}</ListItem>
-                ) : null
-              )}
-          </List>
-        </div>
-      </main>
-    </>
-  );
+    //locations取得(local)
+    useEffect(() => {
+        const getLocation = async () => {
+            setLocation(await fetchLocation(locationId));
+        };
+        if (locationId) {
+            getLocation();
+        }
+    },[locationId]);
+
+
+    return (
+        <>
+            <main>
+                <div>
+                    <h2>Profile</h2>
+                    <p>{userName}</p>
+                    <p>{location&&location.locationName}</p>
+                    <p>{birth}</p>
+                    <p>{profile}</p>
+                    <Button variant="outlined" startIcon={<EditIcon />} onClick={() => {
+                        router.push("profile/edit");
+                    }}>
+                        編集
+                    </Button>
+                </div>
+            </main>
+        </>
+    );
 };
+
 
 export default profile;
