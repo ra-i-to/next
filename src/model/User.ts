@@ -4,11 +4,11 @@ export class User {
   private _name?: string;
   private _birth?: Date | null;
   private _profile?: string;
+  private _locationId?: string | null;
   private _createdAt: Date;
   private _updatedAt: Date;
   private _deletedAt?: Date | null;
   // private _icon?: Icon | null;
-  // private _locationId?: string | null;
   // private _location?: Location | null;
 
   constructor(
@@ -17,11 +17,11 @@ export class User {
     name: string,
     birth: Date | null,
     profile: string,
+    locationId: string | null,
     createdAt: Date,
     updatedAt: Date,
     deletedAt?: Date
     // icon?: Icon,
-    // locationId?: string
     // location?: Location
   ) {
     this._id = id;
@@ -29,11 +29,11 @@ export class User {
     this._name = name;
     this._birth = birth;
     this._profile = profile;
+    this._locationId = locationId;
     this._createdAt = createdAt;
     this._updatedAt = updatedAt;
     this._deletedAt = deletedAt;
     // this._icon = icon;
-    // this._locationId = locationId;
     // this._location = location;
   }
 
@@ -101,11 +101,11 @@ export class User {
     this._deletedAt = value;
   }
 
-  // get locationId(): string | null | undefined {
-  //   return this._locationId;
-  // }
+  get locationId(): string | null | undefined {
+    return this._locationId;
+  }
 
-  // set locationId(value: string | null | undefined) {
-  //   this._locationId = value;
-  // }
+  set locationId(value: string | null | undefined) {
+    this._locationId = value;
+  }
 }

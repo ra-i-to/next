@@ -3,7 +3,7 @@ import { User } from "../../model/User";
 export const useGetUser = (accountId: string) => {
   const fetchUser = async () => {
     try {
-      const response = await fetch("/api/users" + "?accountId=" + accountId, {
+      const response = await fetch("/api/users/" + accountId, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -24,6 +24,7 @@ export const useGetUser = (accountId: string) => {
         data.name,
         data.birth,
         data.profile,
+        data.locationId,
         data.createdAt,
         data.updatedAt
       );
