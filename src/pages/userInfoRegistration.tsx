@@ -73,27 +73,21 @@ const userInfoRegistration: NextPage = (props: Props) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  const handleClickRegist = async () => {
+  const validation = async () => {
     // 入力チェック
     setValidateFlag(false);
     setValidateMessages([]);
+    const messages = [];
     if (!userName) {
-      setValidateFlag(true);
-      setValidateMessages((prev) => [
-        ...prev,
-        "ユーザー名を入力してください。",
-      ]);
+      messages.push("ユーザー名を入力してください。");
     }
     let birthDate = null;
     if (!birth) {
-      setValidateMessages((prev) => [...prev, "生年月日を入力してください。"]);
+      messages.push("生年月日を入力してください。");
     } else {
       const birthRegex = /^\d{8}$/;
       if (!birthRegex.test(birth)) {
-        setValidateMessages((prev) => [
-          ...prev,
-          "生年月日を「YYYYMMDD」の形式で入力してください。",
-        ]);
+        messages.push("生年月日を「YYYYMMDD」の形式で入力してください。");
       } else {
         const year = parseInt(birth.substring(0, 4), 10);
         const month = parseInt(birth.substring(4, 6), 10);
@@ -104,26 +98,34 @@ const userInfoRegistration: NextPage = (props: Props) => {
           birthDate.getMonth() + 1 !== month ||
           birthDate.getDate() !== day
         ) {
-          setValidateMessages((prev) => [
-            ...prev,
-            "生年月日を正しく入力してください。",
-          ]);
+          messages.push("生年月日を正しく入力してください。");
         }
       }
     }
     if (!agreed) {
       setValidateMessages((prev) => [...prev, "利用規約に同意してください。"]);
     }
+    return messages;
+  };
 
-    if (validateMessages.length > 0) {
+  const handleClickRegist = async () => {
+    const vmsg = await validation();
+
+    if (vmsg.length > 0) {
+      setValidateMessages(vmsg);
       setValidateFlag(true);
-      return;
+      return false;
     }
 
     console.log(accountId);
     if (!accountId) {
       return false;
     }
+
+    const year = parseInt(birth.substring(0, 4), 10);
+    const month = parseInt(birth.substring(4, 6), 10);
+    const day = parseInt(birth.substring(6, 8), 10);
+    const birthDate = new Date(year, month - 1, day);
 
     // 本会員情報登録処理
     const result = await userRegistration(
