@@ -8,9 +8,21 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
       data: req.body,
     });
     res.json(user);
+  } else if (req.method === "PUT") {
+    const { id,userData } = req.body;
+    if (!id) {
+      res.status(400).json({ error: 'Missing user ID' });
+      return;
+    }
+    const updatedUser = await prisma.user.update({
+      where: { id: id },
+      data: userData,
+    });
+    res.json(updatedUser);
+
   } else {
     res.status(405).end();
   }
-};
+}
 
 export default withApiAuthRequired(handle);

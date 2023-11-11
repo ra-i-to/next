@@ -20,7 +20,6 @@ export class User {
     locationId: string | null,
     createdAt: Date,
     updatedAt: Date,
-    locationId: string,
     deletedAt?: Date,
     // icon?: Icon,
     // location?: Location

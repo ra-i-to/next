@@ -6,7 +6,7 @@ import UserInfoContext from "@/src/contexts/UserInfoContext";
 import {useGetLocation} from "@/src/hooks/location/getLocation";
 import Button from '@mui/material/Button';
 import EditIcon from '@mui/icons-material/Edit';
-
+import {Container, Grid, Box, useTheme, useMediaQuery} from "@mui/material";
 
 type Props = {};
 
@@ -20,6 +20,9 @@ const profile: NextPage = (props: Props) => {
     const [location, setLocation] = useState(null);
     const { fetchLocation } = useGetLocation();
     const router : NextRouter = useRouter();
+
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
     //user情報取得(Auth0侧)
     useEffect(() => {
@@ -49,22 +52,37 @@ const profile: NextPage = (props: Props) => {
         }
     },[locationId]);
 
-
     return (
         <>
             <main>
-                <div>
-                    <h2>Profile</h2>
-                    <p>{userName}</p>
-                    <p>{location&&location.locationName}</p>
-                    <p>{birth}</p>
-                    <p>{profile}</p>
-                    <Button variant="outlined" startIcon={<EditIcon />} onClick={() => {
-                        router.push("profile/edit");
-                    }}>
-                        編集
-                    </Button>
-                </div>
+                <Container
+                    maxWidth="md"
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: isMobile ? "stretch" : "center",
+                        width: isMobile ? "100%" : "900px",
+                    }}
+                >
+                    <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                            <div>
+                                <Box mb={4}>
+                                    <h2>Profile</h2>
+                                </Box>
+                                <p>{userName}</p>
+                                <p>{location&&location.locationName}</p>
+                                <p>{birth}</p>
+                                <p>{profile}</p>
+                                <Button variant="outlined" startIcon={<EditIcon />} onClick={() => {
+                                    router.push("profile/edit");
+                                }}>
+                                    編集
+                                </Button>
+                            </div>
+                        </Grid>
+                    </Grid>
+                </Container>
             </main>
         </>
     );
