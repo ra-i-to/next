@@ -40,3 +40,6 @@ prisma/dev.db
 
 # upload photos
 /public/uploads/
+
+#idea
+/.idea
